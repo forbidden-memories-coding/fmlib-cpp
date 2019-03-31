@@ -13,7 +13,7 @@ namespace FMLib
     class DataReader
     {
     public:
-        EXPORT      DataReader();
+        EXPORT      DataReader() = default;
 
         EXPORT void LoadDataFromSlus(std::fstream& slus, Data& dat);
         EXPORT void LoadDataFromWaMrg(std::fstream& mrg, Data& dat);

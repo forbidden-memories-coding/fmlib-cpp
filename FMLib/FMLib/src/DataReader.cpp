@@ -8,11 +8,6 @@
 
 namespace FMLib
 {
-    DataReader::DataReader()
-    {
-
-    }
-
     void DataReader::LoadDataFromSlus(std::fstream& slus, Data& dat)
     {
 

@@ -16,9 +16,6 @@ namespace FMLib
     {
         struct EXPORT Card
         {
-            Card() = default;
-            ~Card() = default;
-
             int                 Id;
             std::string         Name;
             std::string         Description;
