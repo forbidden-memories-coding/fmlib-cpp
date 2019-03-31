@@ -219,6 +219,6 @@ namespace FMLib
 
     extern "C" EXPORT IDiscPatcher* CALL_CONV GetPatcher(const char* bin, const char* slus, const char* mrg)
     {
-        return new DiscPatcher(std::string(bin), std::string(slus), std::string(mrg));
+        return new DiscPatcher(bin, slus, mrg);
     }
 }
