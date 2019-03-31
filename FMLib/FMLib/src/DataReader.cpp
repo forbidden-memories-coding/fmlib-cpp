@@ -100,7 +100,6 @@ namespace FMLib
         // Fusions
         mrg.seekg(0xB87800);
         unsigned char fuseDat[0x10000];
-        //mrg.read(fuseDat, 0x10000);
         ReadType(mrg, fuseDat, sizeof(unsigned char) * 0x10000);
 
         for(int i = 0; i < 722; ++i)
@@ -148,7 +147,6 @@ namespace FMLib
         // Equips
         mrg.seekg(0xB85000);
         unsigned char equipDat[0x2800];
-        //mrg.read(equipDat, 0x2800);
         ReadType(mrg, equipDat, sizeof(unsigned char) * 0x2800);
 
         int position = 0;
@@ -178,7 +176,6 @@ namespace FMLib
         // Card costs/passwords
         unsigned char starCost[722 * 8];
         mrg.seekg(0xFB9808, mrg.beg);
-        //mrg.read(starCost, 722 * 8);
         ReadType(mrg, starCost, sizeof(unsigned char) * 722 * 8);
 
         position = 0;
