@@ -8,10 +8,6 @@
 #include <fstream>
 #include <vector>
 
-#define CHUNK_SIZE 2352
-#define DATA_SIZE 2048
-// This should be the proper table for CRC32 calculation for all PSX games (from Mednafen-core's github)
-
 namespace FMLib
 {
     struct IDiscPatcher

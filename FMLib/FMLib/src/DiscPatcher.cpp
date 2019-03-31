@@ -69,6 +69,9 @@ static const unsigned long edcTable[256] = {
 
 namespace FMLib
 {
+    constexpr int CHUNK_SIZE = 2352;
+    constexpr int DATA_SIZE = 2048;
+
     static void writeWithCrc(std::fstream& f, std::fstream& bin, int chunks)
     {
         char crcCalc[2056] = {0, 0, 8, 0, 0, 0, 8, 0};
