@@ -3,7 +3,7 @@
 namespace FMLib
 {
 
-    DiscPatcher::DiscPatcher(std::string bin, std::string slus, std::string mrg)
+    DiscPatcher::DiscPatcher(const std::string& bin, const std::string& slus, const std::string& mrg)
         : m_binFile(bin, std::ios::in | std::ios::out | std::ios::binary),
         m_edcTable{__EDCTABLE__}
     {

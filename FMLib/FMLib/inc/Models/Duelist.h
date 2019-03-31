@@ -13,7 +13,7 @@ namespace FMLib
     {
         struct EXPORT Duelist
         {
-            Duelist(std::string name = "");
+            Duelist(const std::string& name = "");
             
             std::string Name;
             int         Deck[722];

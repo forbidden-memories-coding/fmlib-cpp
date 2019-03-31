@@ -21,7 +21,7 @@ namespace FMLib
         virtual Data* LoadData() = 0;
         virtual bool PatchImage(const char* imgName) = 0;
         virtual void SaveChanges() = 0;
-        virtual void WriteData(const Data* dat) = 0;
+        virtual void WriteData(const Data& dat) = 0;
         virtual void SetBin(const char* newPath) = 0;
         virtual const char* GetBinPath() = 0;
         virtual const char* GetSlusPath() = 0;
@@ -30,13 +30,13 @@ namespace FMLib
     class FMLib : public IFMLib
     {
     public:
-        explicit  FMLib(std::string binPath);
-        FMLib(std::string slusPath, std::string mrgPath);
+        explicit  FMLib(const std::string& binPath);
+        FMLib(const std::string& slusPath, const std::string& mrgPath);
         ~FMLib();
 
         Data*   LoadData();
         bool    PatchImage(const char* imgName);
-        void    WriteData(const Data* dat);
+        void    WriteData(const Data& dat);
         void    SaveChanges();
 
         void  SetBin(const char* newPath);

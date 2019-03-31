@@ -20,7 +20,7 @@ namespace FMLib
         EXPORT void LoadAllData(std::fstream& slus, std::fstream& mrg, Data& dat);
 
     private:
-        std::string  GetText(std::fstream& f, std::map<BYTE, char> dic);
+        std::string  GetText(std::fstream& f, const std::map<BYTE, char>& dic);
         
         template<typename T>
         T ReadType(std::fstream& f);

@@ -5,7 +5,7 @@
 namespace FMLib
 {
 
-    FMLib::FMLib(std::string binPath)
+    FMLib::FMLib(const std::string& binPath)
       : m_patcher(binPath),
         m_reader(),
         m_bin(binPath, std::ios::binary | std::ios::in | std::ios::out),
@@ -16,7 +16,7 @@ namespace FMLib
         ExtractFiles();
     }
 
-    FMLib::FMLib(std::string slusPath, std::string mrgPath)
+    FMLib::FMLib(const std::string& slusPath, const std::string& mrgPath)
       : m_patcher("", slusPath, mrgPath),
         m_reader(),
         m_slus(slusPath, std::ios::in | std::ios::out | std::ios::binary),
@@ -114,7 +114,7 @@ namespace FMLib
         }
     }
 
-    void FMLib::WriteData(const Data* dat)
+    void FMLib::WriteData(const Data& dat)
     {
 
         int fusionTables[] = {
@@ -133,7 +133,7 @@ namespace FMLib
         // Write fusions
         int pos1 = 2;
         int pos2 = 0;
-        for(Card card : dat->Cards)
+        for(Card card : dat.Cards)
         {
             short num1 = card.Fusions.size() != 0 ? pos2 + sizeof(memStream1) : 0;
             memStream1[pos1++] = num1 & 0xFF; 
@@ -193,9 +193,9 @@ namespace FMLib
         int pos = 0;
         for(int i = 0; i < 722; ++i)
         {
-            int val = (dat->Cards[i].Attack / 10 & 0x1FF) | (dat->Cards[i].Defense / 10 & 0x1FF) << 9 |
-                        (dat->Cards[i].GuardianStar_Primary & 0xF) << 18 |
-                        (dat->Cards[i].GuardianStar_Secondary & 0xF) << 22 | (dat->Cards[i].Type & 0x1F) << 26;
+            int val = (dat.Cards[i].Attack / 10 & 0x1FF) | (dat.Cards[i].Defense / 10 & 0x1FF) << 9 |
+                        (dat.Cards[i].GuardianStar_Primary & 0xF) << 18 |
+                        (dat.Cards[i].GuardianStar_Secondary & 0xF) << 22 | (dat.Cards[i].Type & 0x1F) << 26;
             memStream[pos++] = val & 0xFF;
             memStream[pos++] = val >> 8 & 0xFF;
             memStream[pos++] = val >> 16 & 0xFF;
@@ -211,7 +211,7 @@ namespace FMLib
             m_mrg.seekg(num);
             unsigned char memStream[1444] = {0};
             pos = 0;
-            for(int t : dat->Duelists[i].Deck)
+            for(int t : dat.Duelists[i].Deck)
             {
                 short val = t;
                 memStream[pos++] = val & 0xFF;
@@ -221,7 +221,7 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x5B4);
             pos = 0;
-            for(int t : dat->Duelists[i].Drop.SaPow)
+            for(int t : dat.Duelists[i].Drop.SaPow)
             {
                 short val = t;
                 memStream[pos++] = val & 0xFF;
@@ -231,7 +231,7 @@ namespace FMLib
 
             m_mrg.seekg(num + 0xB68);
             pos = 0;
-            for(int t : dat->Duelists[i].Drop.BcdPow)
+            for(int t : dat.Duelists[i].Drop.BcdPow)
             {
                 short val = t;
                 memStream[pos++] = val & 0xFF;
@@ -241,7 +241,7 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x111C);
             pos = 0;
-            for(int t : dat->Duelists[i].Drop.SaTec)
+            for(int t : dat.Duelists[i].Drop.SaTec)
             {
                 short val = t;
                 memStream[pos++] = val & 0xFF;
@@ -255,12 +255,12 @@ namespace FMLib
         for(int i = 0; i < 722; ++i)
         {
             unsigned char cost_arr[4];
-            cost_arr[0] = dat->Cards[i].Starchip.Cost & 0xFF;
-            cost_arr[1] = dat->Cards[i].Starchip.Cost >> 8 & 0xFF;
-            cost_arr[2] = dat->Cards[i].Starchip.Cost >> 16 & 0xFF;
-            cost_arr[3] = dat->Cards[i].Starchip.Cost >> 24 & 0xFF;
+            cost_arr[0] = dat.Cards[i].Starchip.Cost & 0xFF;
+            cost_arr[1] = dat.Cards[i].Starchip.Cost >> 8 & 0xFF;
+            cost_arr[2] = dat.Cards[i].Starchip.Cost >> 16 & 0xFF;
+            cost_arr[3] = dat.Cards[i].Starchip.Cost >> 24 & 0xFF;
             unsigned char pass_arr[4];
-            hex2bin(dat->Cards[i].Starchip.PasswordStr.c_str(), reinterpret_cast<char*>(pass_arr));
+            hex2bin(dat.Cards[i].Starchip.PasswordStr.c_str(), reinterpret_cast<char*>(pass_arr));
             int offset = 0;
             for(int j = sizeof(cost_arr) - 2; j >= 2; --j)
             {

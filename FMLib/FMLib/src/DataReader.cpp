@@ -240,7 +240,7 @@ namespace FMLib
     }
 
 
-    std::string DataReader::GetText(std::fstream& f, std::map<BYTE, char> dic)
+    std::string DataReader::GetText(std::fstream& f, const std::map<BYTE, char>& dic)
     {
         std::string res = "";
 
@@ -252,7 +252,7 @@ namespace FMLib
 
             if (dic.find(b_num) != dic.end())
             {
-                res += dic[b_num];
+                res += dic.at(b_num);
             }
             else if (b_num == 65534)
             {

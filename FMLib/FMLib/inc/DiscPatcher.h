@@ -90,7 +90,7 @@ namespace FMLib
     class DiscPatcher : public IDiscPatcher
     {
     public:
-             DiscPatcher(std::string bin, std::string slus = "", std::string mrg = "");
+             DiscPatcher(const std::string& bin, const std::string& slus = "", const std::string& mrg = "");
              ~DiscPatcher();
         bool PatchImage(const char* imgName);
 
