@@ -13,15 +13,13 @@ namespace FMLib
     class DataReader
     {
     public:
-        EXPORT      DataReader() = default;
+        EXPORT      DataReader() = default; 
 
         EXPORT void LoadDataFromSlus(std::fstream& slus, Data& dat);
         EXPORT void LoadDataFromWaMrg(std::fstream& mrg, Data& dat);
         EXPORT void LoadAllData(std::fstream& slus, std::fstream& mrg, Data& dat);
 
     private:
-        std::string  GetText(std::fstream& f, const std::map<BYTE, char>& dic);
-        
         template<typename T>
         T ReadType(std::fstream& f);
 

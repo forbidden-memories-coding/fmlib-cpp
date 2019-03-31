@@ -33,10 +33,6 @@ namespace FMLib
         void SetMrg(const char* newPath);
 
     private:
-        void        hex2bin(const char* src, char* target);
-        void        writeWithCrc(std::fstream& f, std::fstream& bin, int chunks);
-
-    private:
         std::fstream                    m_binFile;
         std::fstream                    m_slusFile;
         std::fstream                    m_mrgFile;

@@ -4,6 +4,26 @@
 
 namespace FMLib
 {
+    // Thanks to https://stackoverflow.com/a/40210047
+    void hex2bin(const char* src, char* target)
+    {
+        auto char2int = [](char input)
+        {
+            if(input >= '0' && input <= '9')
+                return input - '0';
+            if(input >= 'A' && input <= 'F')
+                return input - 'A' + 10;
+            if(input >= 'a' && input <= 'f')
+                return input - 'a' + 10;
+            throw std::invalid_argument("Invalid input string");
+        };
+
+        while(*src && src[1])
+        {
+            *(target++) = char2int(*src)*16 + char2int(src[1]);
+            src += 2;
+        }
+    }
 
     FMLib::FMLib(const std::string& binPath)
       : m_patcher(binPath),
@@ -91,27 +111,6 @@ namespace FMLib
     const char* FMLib::GetSlusPath()
     {
         return m_slusPath.c_str();
-    }
-
-    // Thanks to https://stackoverflow.com/a/40210047
-    void FMLib::hex2bin(const char* src, char* target)
-    {
-        auto char2int = [](char input)
-        {
-            if(input >= '0' && input <= '9')
-                return input - '0';
-            if(input >= 'A' && input <= 'F')
-                return input - 'A' + 10;
-            if(input >= 'a' && input <= 'f')
-                return input - 'a' + 10;
-            throw std::invalid_argument("Invalid input string");
-        };
-
-        while(*src && src[1])
-        {
-            *(target++) = char2int(*src)*16 + char2int(src[1]);
-            src += 2;
-        }
     }
 
     void FMLib::WriteData(const Data& dat)

@@ -8,9 +8,41 @@
 
 namespace FMLib
 {
+    static std::string GetText(std::fstream& f, const std::map<BYTE, char>& dic)
+    {
+        std::string res = "";
+
+        while (true)
+        {
+            char b;
+            f.read(&b, 1);
+            BYTE b_num = b;
+
+            if (dic.find(b_num) != dic.end())
+            {
+                res += dic.at(b_num);
+            }
+            else if (b_num == 65534)
+            {
+                res += "\r\n";
+            }
+            else
+            {
+                if (b_num == 65535)
+                    break;
+
+                std::stringstream ss;
+                ss << std::setfill('0') << std::setw(2) << std::hex << b_num;
+                res += "[" + ss.str() + "]";
+            }
+            
+        }
+
+        return res;
+    }
+
     void DataReader::LoadDataFromSlus(std::fstream& slus, Data& dat)
     {
-
         // General card data
         slus.seekg(0x1C4A44);
         for (int i = 0; i < 722; ++i)
@@ -237,39 +269,5 @@ namespace FMLib
     {
         LoadDataFromSlus(slus, dat);
         LoadDataFromWaMrg(mrg, dat);
-    }
-
-
-    std::string DataReader::GetText(std::fstream& f, const std::map<BYTE, char>& dic)
-    {
-        std::string res = "";
-
-        while (true)
-        {
-            char b;
-            f.read(&b, 1);
-            BYTE b_num = b;
-
-            if (dic.find(b_num) != dic.end())
-            {
-                res += dic.at(b_num);
-            }
-            else if (b_num == 65534)
-            {
-                res += "\r\n";
-            }
-            else
-            {
-                if (b_num == 65535)
-                    break;
-
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(2) << std::hex << b_num;
-                res += "[" + ss.str() + "]";
-            }
-            
-        }
-
-        return res;
     }
 }

@@ -45,10 +45,7 @@ namespace FMLib
         const char* GetSlusPath();
         const char* GetMrgPath();
 
-        
-
     private:
-        void  hex2bin(const char* src, char* target);
         void  ExtractFiles();
 
     private:
