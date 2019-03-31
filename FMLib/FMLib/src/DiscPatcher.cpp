@@ -139,13 +139,10 @@ namespace FMLib
 
         newBin.close();
 
-        std::fstream newCue(std::string(imgName)+".cue", std::ios::out);
-        const std::string fName = "FILE \""+std::string(imgName)+".bin\" BINARY\n";
-        const char* cueSheet[] = {fName.c_str(), "  TRACK 01 MODE2/2352\n", "    INDEX 01 00:00:00\n"};
-        const int lineSize[] = {fName.size()+1, sizeof("  TRACK 01 MODE2/2352\n"), sizeof("    INDEX 01 00:00:00\n")};
-        for(int i = 0; i < 3; ++i)
-            newCue.write(cueSheet[i], lineSize[i]-1);
-
+        std::fstream newCue(std::string(imgName) + ".cue", std::ios::out);
+        const std::string fName = "FILE \"" + std::string(imgName) + ".bin\" BINARY\n";
+        const std::string cueSheet = fName + "  TRACK 01 MODE2/2352\n    INDEX 01 00:00:00\n";
+        newCue.write(cueSheet.c_str(), cueSheet.size());
         newCue.close();
 
         return true;
