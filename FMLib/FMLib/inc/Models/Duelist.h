@@ -5,6 +5,7 @@
 #include "../Export.h"
 #include "Rank.h"
 #include <string>
+#include <cstring>
 
 namespace FMLib
 {
@@ -17,6 +18,7 @@ namespace FMLib
             std::string Name;
             int         Deck[722];
             Rank        Drop;
+            
         };
     }
 }

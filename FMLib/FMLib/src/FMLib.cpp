@@ -194,8 +194,8 @@ namespace FMLib
         for(int i = 0; i < 722; ++i)
         {
             int val = (dat->Cards[i].Attack / 10 & 0x1FF) | (dat->Cards[i].Defense / 10 & 0x1FF) << 9 |
-                        (dat->Cards[i].GuardianStar_Secondary & 0xF) << 18 |
-                        (dat->Cards[i].GuardianStar_Primary & 0xF) << 22 | (dat->Cards[i].Type & 0x1F) << 26;
+                        (dat->Cards[i].GuardianStar_Primary & 0xF) << 18 |
+                        (dat->Cards[i].GuardianStar_Secondary & 0xF) << 22 | (dat->Cards[i].Type & 0x1F) << 26;
             memStream[pos++] = val & 0xFF;
             memStream[pos++] = val >> 8 & 0xFF;
             memStream[pos++] = val >> 16 & 0xFF;

@@ -18,9 +18,9 @@ namespace FMLib
     {
         struct EXPORT Rank
         {
-            int SaPow[722];
-            int SaTec[722];
-            int BcdPow[722];
+            int SaPow[722] = {0};
+            int SaTec[722] = {0};
+            int BcdPow[722] = {0};
 
             int* GetDropType(DropType type);
             
