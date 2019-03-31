@@ -106,22 +106,6 @@ namespace FMLib
         }
     }
 
-    DiscPatcher::~DiscPatcher()
-    {
-        if (m_binFile.is_open())
-        {
-            m_binFile.close();
-        }
-        if (m_slusFile.is_open())
-        {
-            m_slusFile.close();
-        }
-        if (m_mrgFile.is_open())
-        {
-            m_mrgFile.close();
-        }
-    }
-
     bool DiscPatcher::PatchImage(const char* imgName)
     {
         if (!m_binFile.is_open() || !m_slusFile.is_open() || !m_mrgFile.is_open()) return false;

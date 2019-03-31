@@ -25,7 +25,6 @@ namespace FMLib
     {
     public:
              DiscPatcher(const std::string& bin, const std::string& slus = "", const std::string& mrg = "");
-             ~DiscPatcher();
         bool PatchImage(const char* imgName);
 
         void SetBin(const char* newPath);
