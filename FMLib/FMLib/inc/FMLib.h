@@ -55,7 +55,7 @@ namespace FMLib
             char address[3];
             char mode;
             char subheader[8];
-            char data[DATA_SIZE];
+            char data[2048]; // 2048 is raw data size
             char errorDetect[4];
             char errorCorrection[276];
         };

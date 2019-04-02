@@ -4,6 +4,9 @@
 
 namespace FMLib
 {
+    constexpr int CHUNK_SIZE = 2352;
+    constexpr int DATA_SIZE = 2048;
+
     // Thanks to https://stackoverflow.com/a/40210047
     void hex2bin(const char* src, char* target)
     {
