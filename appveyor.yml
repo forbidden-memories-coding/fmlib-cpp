@@ -1,0 +1,14 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build_script:
+- cmd: cmake .\FMLib\
+artifacts:
+- path: /
+  name: fmlib-cpp
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: patsKxjITR/ZHoJ+aHVfmsIrZmVMioGhlblUcPeO8rZSVvAiazQH7p4QYWkw86UO
+  artifact: fmlib-ci
+  prerelease: true
+  force_update: true
