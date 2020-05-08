@@ -13,11 +13,11 @@ enum DropType
 };
 struct Rank
 {
-    int SaPow[722];
-    int SaTec[722];
-    int BcdPow[722];
-    
-    int* GetDropType(DropType type);
+    int SaPow[722] = {0};
+    int BcdPow[722] = {0};
+    int SaTec[722] = {0};
 };
 
+extern "C" EXPORT int* CALL_CONV GetDropType(Rank* rank, DropType type);
+ 
 #endif // RANK_H

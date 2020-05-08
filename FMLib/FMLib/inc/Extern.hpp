@@ -6,11 +6,11 @@
 
 struct Data
 {
-    struct Card             Cards[722];
-    struct Duelist          Duelists[39];
-    char*                   BinPath;
-    char*                   SlusPath;
-    char*                   MrgPath;
+    Card    Cards[722];
+    Duelist Duelists[39];
+    char*   BinPath;
+    char*   SlusPath;
+    char*   MrgPath;
 };
 
 struct IFMLib{};

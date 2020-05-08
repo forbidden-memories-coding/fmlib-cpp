@@ -1,17 +1,17 @@
 #include "Models/Models.hpp"
 
-int* Rank::GetDropType(DropType type)
+extern "C" EXPORT int* CALL_CONV GetDropType(Rank* rank, DropType type)
 {
     switch (type)
     {
         case DropType::SAPOW:
-            return SaPow;
+            return rank->SaPow;
 
         case DropType::SATEC:
-            return SaTec;
+            return rank->SaTec;
 
         case DropType::BCDPOW:
-            return BcdPow;
+            return rank->BcdPow;
 
         default:
             return nullptr;

@@ -1,7 +1,7 @@
 #include "Data.hpp"
 
 // Init character table
-_Data::_Data(Data& gameData) : gameData(gameData)
+InternalData::InternalData(Data* gameData) : gameData(gameData)
 {
     Dict[0x18] = 'A';
     Dict[0x2D] = 'B';

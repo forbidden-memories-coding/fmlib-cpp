@@ -8,6 +8,6 @@ struct Duelist
 {
     char*          Name;
     int            Deck[722];
-    Rank            Drop;
+    Rank           Drop;
 };
 #endif // DUELIST_H

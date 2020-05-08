@@ -29,7 +29,7 @@ namespace FMLib
     }
 
     FMLib::FMLib(const std::string& binPath)
-      : m_data(Data()),
+      : m_data(new Data()),
         m_patcher(binPath),
         m_reader(),
         m_bin(binPath, std::ios::binary | std::ios::in | std::ios::out),
@@ -41,7 +41,7 @@ namespace FMLib
     }
 
     FMLib::FMLib(const std::string& slusPath, const std::string& mrgPath)
-      : m_data(Data()),
+      : m_data(new Data()),
         m_patcher("", slusPath, mrgPath),
         m_reader(),
         m_slus(slusPath, std::ios::in | std::ios::out | std::ios::binary),
@@ -61,7 +61,7 @@ namespace FMLib
     Data* FMLib::LoadData()
     {
         m_reader.LoadAllData(m_slus, m_mrg, m_data);
-        return &m_data.gameData;
+        return m_data.gameData;
     }
 
     bool FMLib::PatchImage(const char* imgName)
@@ -121,7 +121,7 @@ namespace FMLib
     {
         for(int i = 0; i < 722; ++i)
         {
-            auto card = m_data.gameData.Cards[i];
+            auto card = m_data.gameData->Cards[i];
             delete[] card.Name;
             delete[] card.Description;
             delete[] card.Fusions;
@@ -129,7 +129,7 @@ namespace FMLib
         }
         for(int i = 0; i < 39; ++i)
         {
-            auto duelist = m_data.gameData.Duelists[i];
+            auto duelist = m_data.gameData->Duelists[i];
             delete[] duelist.Name;
         }
     }
@@ -241,9 +241,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x5B4);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.SaPow)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.SaPow[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }
@@ -251,9 +251,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0xB68);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.BcdPow)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.BcdPow[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }
@@ -261,9 +261,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x111C);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.SaTec)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.SaTec[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }

@@ -14,9 +14,9 @@ namespace FMLib
     public:
         DataReader() = default; 
 
-        void LoadDataFromSlus(std::fstream& slus, _Data& dat);
-        void LoadDataFromWaMrg(std::fstream& mrg, _Data& dat);
-        void LoadAllData(std::fstream& slus, std::fstream& mrg, _Data& dat);
+        void LoadDataFromSlus(std::fstream& slus, InternalData& dat);
+        void LoadDataFromWaMrg(std::fstream& mrg, InternalData& dat);
+        void LoadAllData(std::fstream& slus, std::fstream& mrg, InternalData& dat);
 
     private:
         template<typename T>

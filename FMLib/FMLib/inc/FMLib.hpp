@@ -44,7 +44,7 @@ namespace FMLib
         };
 
     private:
-        _Data           m_data;
+        InternalData    m_data;
         DiscPatcher     m_patcher;
         DataReader      m_reader;
         std::fstream    m_bin;

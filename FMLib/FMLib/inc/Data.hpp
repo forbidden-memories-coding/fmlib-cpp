@@ -12,10 +12,10 @@
 
 typedef unsigned short BYTE;
 
-struct _Data
+struct InternalData
 {
-    _Data(Data& gameData);
-    Data&                   gameData;
+    InternalData(Data* gameData);
+    Data*                   gameData;
     std::map<BYTE, char>    Dict;
     std::map<char, BYTE>    RDict;
 };
