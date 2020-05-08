@@ -1,4 +1,4 @@
-#include "DataReader.h"
+#include "DataReader.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -41,30 +41,36 @@ namespace FMLib
         return res;
     }
 
-    void DataReader::LoadDataFromSlus(std::fstream& slus, Data& dat)
+    void DataReader::LoadDataFromSlus(std::fstream& slus, _Data& dat)
     {
         // General card data
         slus.seekg(0x1C4A44);
         for (int i = 0; i < 722; ++i)
         {
-            int num_struct = ReadType<int>(slus);
+            int cardDataPacked = ReadType<int>(slus);
 
-            dat.Cards[i].Id = i + 1;
-            dat.Cards[i].Attack = (num_struct & 0x1FF) * 10;
-            dat.Cards[i].Defense = (num_struct >> 9 & 0x1FF) * 10;
-            dat.Cards[i].GuardianStar_Primary = num_struct >> 18 & 0xF;
-            dat.Cards[i].GuardianStar_Secondary = num_struct >> 22 & 0xF;
-            dat.Cards[i].Type = num_struct >> 26 & 0x1F;
+            dat.gameData.Cards[i].Id = i + 1;
+            dat.gameData.Cards[i].Attack = (cardDataPacked & 0x1FF) * 10; // Unwrap attack value
+            dat.gameData.Cards[i].Defense = (cardDataPacked >> 9 & 0x1FF) * 10; // Unwrap defense value
+            dat.gameData.Cards[i].GuardianStar_Primary = cardDataPacked >> 18 & 0xF; // Unwrap 1st guardian star
+            dat.gameData.Cards[i].GuardianStar_Secondary = cardDataPacked >> 22 & 0xF; // Unwrap 2nd guardian star
+            dat.gameData.Cards[i].Type = cardDataPacked >> 26 & 0x1F; // Unwrap card's type
         }
+
+        std::cout << dat.gameData.Cards[0].Attack << "\n";
+
+        std::cout << "Loaded general cards data...\n";
 
         // Cards level and attribute
         slus.seekg(0x1C5B33L);
         for (int i = 0; i < 722; ++i)
         {
-            unsigned char str_num = ReadType<unsigned char>(slus);
-            dat.Cards[i].Level = str_num & 0xF;
-            dat.Cards[i].Attribute = str_num >> 4 & 0xF;
+            unsigned char levelAttrPack = ReadType<unsigned char>(slus);
+            dat.gameData.Cards[i].Level = levelAttrPack & 0xF; // Unwrap card level
+            dat.gameData.Cards[i].Attribute = levelAttrPack >> 4 & 0xF; // Unwrap card's attribute
         }
+
+        std::cout << "Loaded cards level and attribute...\n";
 
         // Card name
         for(int i = 0; i < 722; ++i)
@@ -72,8 +78,13 @@ namespace FMLib
             slus.seekg(0x1C6002 + i * 2);
             unsigned short num = ReadType<unsigned short>(slus);
             slus.seekg(0x1C6800 + num - 0x6000);
-            dat.Cards[i].Name = GetText(slus, dat.Dict);
+            auto cardName = GetText(slus, dat.Dict);
+            dat.gameData.Cards[i].Name = new char[cardName.size() + 1]; // TODO: Check if any leaks occur
+            strcpy_s(dat.gameData.Cards[i].Name, cardName.size() + 1, cardName.c_str());
+            // dat.gameData.Cards[i].Name = GetText(slus, dat.Dict).c_str();
         }
+
+        std::cout << "Loaded cards names...\n";
         
         // Card description
         for(int i = 0; i < 722; ++i)
@@ -81,21 +92,35 @@ namespace FMLib
             slus.seekg(0x1B0A02 + i * 2);
             unsigned short off = ReadType<unsigned short>(slus);
             slus.seekg(0x1B11F4 + (off - 0x9F4));
-            dat.Cards[i].Description = GetText(slus, dat.Dict);
+            auto cardDesc = GetText(slus, dat.Dict);
+            dat.gameData.Cards[i].Description = new char[cardDesc.size() + 1]; // TODO: Check if any leaks occur
+            strcpy_s(dat.gameData.Cards[i].Description, cardDesc.size() + 1, cardDesc.c_str());
+            // dat.gameData.Cards[i].Description = GetText(slus, dat.Dict);
         }
 
+        std::cout << "Loaded cards descriptions...\n";
+
         // Duelist names
-        slus.seekg(0x1C93DB);
         for(int i = 0; i < 39; ++i)
         {
             slus.seekg(0x1C6652 + i * 2);
             slus.seekg(0x1C6800 + ReadType<unsigned short>(slus) - 0x6000);
-            dat.Duelists[i] = Duelist(GetText(slus, dat.Dict));
+            auto duelName = GetText(slus, dat.Dict);
+            auto nameAlloc = new char[duelName.size() + 1]; // TODO: Check if any leaks occur
+            std::cout << "Duelist name: " << duelName << "\n";
+            std::cout << "Loop index: " << i << "\n";
+            strcpy_s(nameAlloc, duelName.size() + 1, duelName.c_str());
+            // dat.gameData.Duelists[i].Name = nameAlloc;
+            auto duelist = Duelist();
+            dat.gameData.Duelists[i] = duelist;
+            dat.gameData.Duelists[i].Name = nameAlloc;
         }
+
+        std::cout << "Loaded duelists names...\n";
         
     }
 
-    void DataReader::LoadDataFromWaMrg(std::fstream& mrg, Data& dat)
+    void DataReader::LoadDataFromWaMrg(std::fstream& mrg, _Data& dat)
     {
         // Fusions
         mrg.seekg(0xB87800);
@@ -105,6 +130,7 @@ namespace FMLib
         for(int i = 0; i < 722; ++i)
         {
             long position = 2 + i * 2;
+            int fusionIndex = 0;
             unsigned char posDat[2];
             posDat[0] = fuseDat[position];
             posDat[1] = fuseDat[position + 1];
@@ -120,6 +146,8 @@ namespace FMLib
                 }
 
                 int num2 = fusionAmt;
+                dat.gameData.Cards[i].FusionsAmount = num2;
+                dat.gameData.Cards[i].Fusions = new Fusion[num2];
 
                 while (num2 > 0)
                 {
@@ -133,12 +161,21 @@ namespace FMLib
                     int num13 = (num3 >> 4 & 3) << 8 | num6;
                     int num15 = (num3 >> 6 & 3) << 8 | num7;
 
-                    dat.Cards[i].Fusions.push_back(Fusion(i + 1, num9 - 1, num11 - 1));
+                    auto fusion = Fusion();
+                    fusion.Card1 = i + 1;
+                    fusion.Card2 = num9 - 1;
+                    fusion.Result = num11 - 1;
+
+                    dat.gameData.Cards[i].Fusions[fusionIndex++] = fusion;
                     --num2;
 
                     if (num2 <= 0) continue;
 
-                    dat.Cards[i].Fusions.push_back(Fusion(i + 1, num13 - 1, num15 - 1));
+                    fusion.Card1 = i + 1;
+                    fusion.Card2 = num13 - 1;
+                    fusion.Result = num15 - 1;
+
+                    dat.gameData.Cards[i].Fusions[fusionIndex++] = fusion;
                     --num2;
                 }
             }
@@ -163,13 +200,14 @@ namespace FMLib
             num[0] = equipDat[position++];
             num[1] = equipDat[position++];
             unsigned short monsterNum = static_cast<unsigned short>(num[1] << 8 | num[0]);
+            dat.gameData.Cards[equipId - 1].Equips = new int[monsterNum];
 
             for(int i = 0; i < monsterNum; ++i)
             {
                 num[0] = equipDat[position++];
                 num[1] = equipDat[position++];
                 unsigned short monsterId = static_cast<unsigned short>(num[1] << 8 | num[0]);
-                dat.Cards[equipId - 1].Equips.push_back(monsterId - 1);
+                dat.gameData.Cards[equipId - 1].Equips[i] = monsterId - 1;
             }
         }
 
@@ -186,7 +224,7 @@ namespace FMLib
             cost[1] = starCost[position++];
             cost[2] = starCost[position++];
             cost[3] = starCost[position++];
-            dat.Cards[i].Starchip.Cost = (cost[3] << 24) | (cost[2] << 16) | (cost[1] << 8) | cost[0];
+            dat.gameData.Cards[i].Starchip.Cost = (cost[3] << 24) | (cost[2] << 16) | (cost[1] << 8) | cost[0];
             unsigned char pass[4];
             pass[0] = starCost[position++];
             pass[1] = starCost[position++];
@@ -200,9 +238,9 @@ namespace FMLib
                 ss << std::setfill('0') << std::setw(2) << std::hex << (int)pass[j];
                 resPass += ss.str();
             }
-            dat.Cards[i].Starchip.PasswordStr = resPass;
-            dat.Cards[i].Starchip.Password = (strcmp(resPass.c_str(), "fffffffe") != 0) ? std::stoi(resPass) : 0;
-                
+            dat.gameData.Cards[i].Starchip.PasswordStr = new char[resPass.size() + 1];
+            strcpy_s(dat.gameData.Cards[i].Starchip.PasswordStr, resPass.size() + 1, resPass.c_str());
+            dat.gameData.Cards[i].Starchip.Password = (strcmp(resPass.c_str(), "fffffffe") != 0) ? std::stoi(resPass) : 0;
         }
         
 
@@ -221,7 +259,7 @@ namespace FMLib
                 unsigned char num[2];
                 num[0] = memStream[position++];
                 num[1] = memStream[position++];
-                dat.Duelists[i].Deck[j] = static_cast<int>(num[1] << 8 | num[0]);
+                dat.gameData.Duelists[i].Deck[j] = static_cast<int>(num[1] << 8 | num[0]);
             }
 
             mrg.seekg(num + 0x5B4);
@@ -233,7 +271,7 @@ namespace FMLib
                 unsigned char num[2];
                 num[0] = memStream[position++];
                 num[1] = memStream[position++];
-                dat.Duelists[i].Drop.SaPow[j] = static_cast<int>(num[1] << 8 | num[0]);
+                dat.gameData.Duelists[i].Drop.SaPow[j] = static_cast<int>(num[1] << 8 | num[0]);
             }
 
             mrg.seekg(num + 0xB68);
@@ -245,7 +283,7 @@ namespace FMLib
                 unsigned char num[2];
                 num[0] = memStream[position++];
                 num[1] = memStream[position++];
-                dat.Duelists[i].Drop.BcdPow[j] = static_cast<int>(num[1] << 8 | num[0]);
+                dat.gameData.Duelists[i].Drop.BcdPow[j] = static_cast<int>(num[1] << 8 | num[0]);
             }
 
             mrg.seekg(num + 0x111C);
@@ -257,14 +295,17 @@ namespace FMLib
                 unsigned char num[2];
                 num[0] = memStream[position++];
                 num[1] = memStream[position++];
-                dat.Duelists[i].Drop.SaTec[j] = static_cast<int>(num[1] << 8 | num[0]);
+                dat.gameData.Duelists[i].Drop.SaTec[j] = static_cast<int>(num[1] << 8 | num[0]);
             }
         }
     }
 
-    void DataReader::LoadAllData(std::fstream& slus, std::fstream& mrg, Data& dat)
+    void DataReader::LoadAllData(std::fstream& slus, std::fstream& mrg, _Data& dat)
     {
+        std::cout << "Started loading data...\n";
         LoadDataFromSlus(slus, dat);
+        std::cout << "Finished loading from SLUS...\n";
         LoadDataFromWaMrg(mrg, dat);
+        std::cout << "Finished loading data...\n";
     }
 }
