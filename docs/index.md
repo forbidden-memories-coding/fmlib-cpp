@@ -6,7 +6,7 @@ This documentation is still pretty much a work in progress and bound to be incom
 ## What is this library supposed to do?
 
 * independent cross platform library
-* read, write and modify _data from the game
+* read, write and modify data from the game
 * provide several functions for game specific tasks
 
 ## Requirements

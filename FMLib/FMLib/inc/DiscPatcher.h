@@ -1,8 +1,8 @@
 #ifndef DISCPATCHER_H
 #define DISCPATCHER_H
 
-#include "Export.hpp"
-#include "Extern.hpp"
+#include "Export.h"
+#include "Models/GameFile.h"
 
 #include <string>
 #include <fstream>
@@ -10,10 +10,17 @@
 
 namespace FMLib
 {
+    struct IDiscPatcher
+    {
+        virtual bool PatchImage(const char* imgName) = 0;
+        virtual void SetBin(const char* newPath) = 0;
+        virtual void SetSlus(const char* newPath) = 0;
+        virtual void SetMrg(const char* newPath) = 0;
+    };
     class DiscPatcher : public IDiscPatcher
     {
     public:
-        DiscPatcher(const std::string& bin, const std::string& slus = "", const std::string& mrg = "");
+             DiscPatcher(const std::string& bin, const std::string& slus = "", const std::string& mrg = "");
         bool PatchImage(const char* imgName);
 
         void SetBin(const char* newPath);
@@ -25,6 +32,8 @@ namespace FMLib
         std::fstream                    m_slusFile;
         std::fstream                    m_mrgFile;
     };
+
+    extern "C" EXPORT IDiscPatcher* CALL_CONV GetPatcher(const char* bin, const char* slus = "", const char* mrg = "");
 }
 
 #endif // DISCPATCHER_H

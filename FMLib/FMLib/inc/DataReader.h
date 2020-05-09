@@ -1,9 +1,10 @@
-// DataReader.h: Used for reading game's data
+// DataReader.h
 
 #ifndef DATAREADER_H
 #define DATAREADER_H
 
-#include "Data.hpp"
+#include "Export.h"
+#include "Data.h"
 
 #include <fstream>
 
@@ -12,11 +13,11 @@ namespace FMLib
     class DataReader
     {
     public:
-        DataReader() = default; 
+        EXPORT      DataReader() = default; 
 
-        void LoadDataFromSlus(std::fstream& slus, InternalData& dat);
-        void LoadDataFromWaMrg(std::fstream& mrg, InternalData& dat);
-        void LoadAllData(std::fstream& slus, std::fstream& mrg, InternalData& dat);
+        EXPORT void LoadDataFromSlus(std::fstream& slus, Data& dat);
+        EXPORT void LoadDataFromWaMrg(std::fstream& mrg, Data& dat);
+        EXPORT void LoadAllData(std::fstream& slus, std::fstream& mrg, Data& dat);
 
     private:
         template<typename T>

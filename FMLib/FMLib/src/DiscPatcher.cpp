@@ -1,6 +1,5 @@
-#include "DiscPatcher.hpp"
+#include "DiscPatcher.h"
 
-// Big and bulky table of EDC to properly set checksums for the .bin file
 static const unsigned long edcTable[256] = {
  0x00000000L, 0x90910101L, 0x91210201L, 0x01B00300L,
  0x92410401L, 0x02D00500L, 0x03600600L, 0x93F10701L,
@@ -171,5 +170,10 @@ namespace FMLib
         if (m_mrgFile.is_open()) m_mrgFile.close();
         m_mrgFile.open(nP, std::ios::in | std::ios::out | std::ios::binary);
         if (!m_mrgFile.is_open()) throw std::string("Given file was not found or corrupt!");
+    }
+
+    extern "C" EXPORT IDiscPatcher* CALL_CONV GetPatcher(const char* bin, const char* slus, const char* mrg)
+    {
+        return new DiscPatcher(bin, slus, mrg);
     }
 }
