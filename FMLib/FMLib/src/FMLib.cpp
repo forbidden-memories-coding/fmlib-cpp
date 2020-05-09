@@ -1,6 +1,6 @@
 // FMLib.cpp
 
-#include "FMLib.h"
+#include "FMLib.hpp"
 
 namespace FMLib
 {
@@ -29,7 +29,8 @@ namespace FMLib
     }
 
     FMLib::FMLib(const std::string& binPath)
-      : m_patcher(binPath),
+      : m_data(new Data()),
+        m_patcher(binPath),
         m_reader(),
         m_bin(binPath, std::ios::binary | std::ios::in | std::ios::out),
         m_binPath(binPath),
@@ -40,7 +41,8 @@ namespace FMLib
     }
 
     FMLib::FMLib(const std::string& slusPath, const std::string& mrgPath)
-      : m_patcher("", slusPath, mrgPath),
+      : m_data(new Data()),
+        m_patcher("", slusPath, mrgPath),
         m_reader(),
         m_slus(slusPath, std::ios::in | std::ios::out | std::ios::binary),
         m_mrg(mrgPath, std::ios::in | std::ios::out | std::ios::binary),
@@ -58,9 +60,8 @@ namespace FMLib
 
     Data* FMLib::LoadData()
     {
-        Data* dat = new Data();
-        m_reader.LoadAllData(m_slus, m_mrg, *dat);
-        return dat;
+        m_reader.LoadAllData(m_slus, m_mrg, m_data);
+        return m_data.gameData;
     }
 
     bool FMLib::PatchImage(const char* imgName)
@@ -116,6 +117,23 @@ namespace FMLib
         return m_slusPath.c_str();
     }
 
+    void FMLib::FreeData()
+    {
+        for(int i = 0; i < 722; ++i)
+        {
+            auto card = m_data.gameData->Cards[i];
+            delete[] card.Name;
+            delete[] card.Description;
+            delete[] card.Fusions;
+            delete[] card.Equips;
+        }
+        for(int i = 0; i < 39; ++i)
+        {
+            auto duelist = m_data.gameData->Duelists[i];
+            delete[] duelist.Name;
+        }
+    }
+
     void FMLib::WriteData(const Data& dat)
     {
 
@@ -137,28 +155,28 @@ namespace FMLib
         int pos2 = 0;
         for(Card card : dat.Cards)
         {
-            short num1 = card.Fusions.size() != 0 ? pos2 + sizeof(memStream1) : 0;
+            short num1 = card.FusionsAmount != 0 ? pos2 + sizeof(memStream1) : 0;
             memStream1[pos1++] = num1 & 0xFF; 
             memStream1[pos1++] = num1 >> 8 & 0xFF;
-            if (card.Fusions.size() != 0)
+            if (card.FusionsAmount != 0)
             {
-                if (card.Fusions.size() < 256)
+                if (card.FusionsAmount < 256)
                 {
-                    memStream2[pos2++] = card.Fusions.size();
+                    memStream2[pos2++] = card.FusionsAmount;
                 }
                 else
                 {
                     memStream2[pos2++] = 0;
-                    memStream2[pos2++] = std::abs((int)card.Fusions.size() - 511);
+                    memStream2[pos2++] = std::abs((int)card.FusionsAmount - 511);
                 }
-                for (int i = 0; i < card.Fusions.size(); ++i)
+                for (int i = 0; i < card.FusionsAmount; ++i)
                 {
                     int num2 = card.Fusions[i].Card2 + 1 & 0xFF;
                     int num3 = card.Fusions[i].Result + 1 & 0xFF;
                     int num4 = 0;
                     int num5 = 0;
                     int num6 = card.Fusions[i].Card2 + 1 >> 8 & 3 | (card.Fusions[i].Result + 1 >> 8 & 3) << 2;
-                    if (i < card.Fusions.size() - 1)
+                    if (i < card.FusionsAmount - 1)
                     {
                         num4 = card.Fusions[i+1].Card2 + 1 & 0xFF;
                         num5 = card.Fusions[i+1].Result + 1 & 0xFF;
@@ -223,9 +241,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x5B4);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.SaPow)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.SaPow[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }
@@ -233,9 +251,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0xB68);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.BcdPow)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.BcdPow[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }
@@ -243,9 +261,9 @@ namespace FMLib
 
             m_mrg.seekg(num + 0x111C);
             pos = 0;
-            for(int t : dat.Duelists[i].Drop.SaTec)
+            for(int t = 0; t < 722; ++t)
             {
-                short val = t;
+                short val = dat.Duelists[i].Drop.SaTec[t];
                 memStream[pos++] = val & 0xFF;
                 memStream[pos++] = val >> 8 & 0xFF;
             }
@@ -262,7 +280,7 @@ namespace FMLib
             cost_arr[2] = dat.Cards[i].Starchip.Cost >> 16 & 0xFF;
             cost_arr[3] = dat.Cards[i].Starchip.Cost >> 24 & 0xFF;
             unsigned char pass_arr[4];
-            hex2bin(dat.Cards[i].Starchip.PasswordStr.c_str(), reinterpret_cast<char*>(pass_arr));
+            hex2bin(dat.Cards[i].Starchip.PasswordStr, reinterpret_cast<char*>(pass_arr));
             int offset = 0;
             for(int j = sizeof(cost_arr) - 2; j >= 2; --j)
             {
@@ -348,15 +366,5 @@ namespace FMLib
 
         delete[] mrgChunks;
         delete[] slusChunks;
-    }
-
-    extern "C" EXPORT IFMLib* CALL_CONV GetLibBin(const char* binPath)
-    {
-        return new FMLib(std::string(binPath));
-    }
-
-    extern "C" EXPORT IFMLib* CALL_CONV GetLibMrgSlus(const char* slusPath, const char* mrgPath)
-    {
-        return new FMLib(std::string(slusPath), std::string(mrgPath));
     }
 }

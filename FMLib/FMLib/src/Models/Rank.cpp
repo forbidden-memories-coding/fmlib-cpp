@@ -1,25 +1,19 @@
-#include "Models/Rank.h"
+#include "Models/Models.hpp"
 
-namespace FMLib
+extern "C" EXPORT int* CALL_CONV GetDropType(Rank* rank, DropType type)
 {
-    namespace Models
+    switch (type)
     {
-        int* Rank::GetDropType(DropType type)
-        {
-            switch (type)
-            {
-                case DropType::SAPOW:
-                    return SaPow;
+        case DropType::SAPOW:
+            return rank->SaPow;
 
-                case DropType::SATEC:
-                    return SaTec;
+        case DropType::SATEC:
+            return rank->SaTec;
 
-                case DropType::BCDPOW:
-                    return BcdPow;
+        case DropType::BCDPOW:
+            return rank->BcdPow;
 
-                default:
-                    return nullptr;
-            }
-        }
+        default:
+            return nullptr;
     }
 }
